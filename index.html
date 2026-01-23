@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Be My Valentine 💗</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+* {
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
+body {
+  margin: 0;
+  background: #fffafc;
+  color: #333;
+  text-align: center;
+  padding: 20px;
+}
+
+.hidden {
+  display: none;
+}
+
+h1 {
+  font-weight: 400;
+}
+
+button {
+  padding: 12px 28px;
+  border-radius: 30px;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#yesBtn {
+  background: #ff8fab;
+  color: white;
+}
+
+#noBtn {
+  background: #eee;
+  position: relative;
+}
+
+.section {
+  margin-top: 80px;
+}
+
+/* Gifts */
+.gifts {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.gift {
+  width: 120px;
+  height: 120px;
+  border-radius: 20px;
+  background: #ffe3ed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 50px;
+  cursor: pointer;
+  transition: transform 0.4s ease;
+}
+
+.gift:hover {
+  transform: scale(1.05);
+}
+
+.reveal img {
+  width: 90%;
+  max-width: 300px;
+  border-radius: 16px;
+  margin-top: 20px;
+}
+
+/* Confetti */
+.confetti {
+  position: fixed;
+  top: -10px;
+  width: 10px;
+  height: 10px;
+  background: pink;
+  animation: fall 3s linear forwards;
+}
+
+@keyframes fall {
+  to {
+    transform: translateY(110vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- PAGE 1 -->
+<div id="page1" class="section">
+  <h1>Can you be my Valentine? 💗</h1>
+  <br><br>
+  <button id="yesBtn">Yes 💖</button>
+  <button id="noBtn">No 🙃</button>
+</div>
+
+<!-- PAGE 2 -->
+<div id="page2" class="section hidden">
+  <h1>Choose a gift 🎁</h1>
+  <p>Each one holds a little piece of us</p>
+
+  <div class="gifts">
+    <div class="gift" onclick="openGift(1)">🎁</div>
+    <div class="gift" onclick="openGift(2)">🎁</div>
+    <div class="gift" onclick="openGift(3)">🎁</div>
+  </div>
+
+  <div id="reveal" class="reveal"></div>
+</div>
+
+<script>
+/* Moving NO button */
+const noBtn = document.getElementById("noBtn");
+noBtn.addEventListener("mouseover", moveButton);
+noBtn.addEventListener("click", moveButton);
+
+function moveButton() {
+  const x = Math.random() * 200 - 100;
+  const y = Math.random() * 200 - 100;
+  noBtn.style.transform = `translate(${x}px, ${y}px)`;
+}
+
+/* YES button */
+document.getElementById("yesBtn").addEventListener("click", () => {
+  launchConfetti();
+  setTimeout(() => {
+    document.getElementById("page1").classList.add("hidden");
+    document.getElementById("page2").classList.remove("hidden");
+  }, 800);
+});
+
+/* Confetti */
+function launchConfetti() {
+  for (let i = 0; i < 80; i++) {
+    const confetti = document.createElement("div");
+    confetti.className = "confetti";
+    confetti.style.left = Math.random() * window.innerWidth + "px";
+    confetti.style.background = ["#ff8fab", "#ffd6e0", "#ffc2d1"][Math.floor(Math.random()*3)];
+    document.body.appendChild(confetti);
+    setTimeout(() => confetti.remove(), 3000);
+  }
+}
+
+/* Gift reveal */
+function openGift(num) {
+  const reveal = document.getElementById("reveal");
+  reveal.innerHTML = `
+    <h2>💗</h2>
+    <img src="photo${num}.jpg">
+    <p>This is one of my favorite memories with you.</p>
+  `;
+}
+</script>
+
+</body>
+</html>
