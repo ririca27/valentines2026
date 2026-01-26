@@ -22,13 +22,9 @@ body {
   overflow-x: hidden;
 }
 
-.hidden {
-  display: none;
-}
+.hidden { display: none; }
 
-h1 {
-  font-weight: 400;
-}
+h1 { font-weight: 400; }
 
 button {
   padding: 12px 28px;
@@ -49,9 +45,7 @@ button {
   position: relative;
 }
 
-.section {
-  margin-top: 80px;
-}
+.section { margin-top: 80px; }
 
 /* Floating hearts */
 .heart-bg {
@@ -74,15 +68,8 @@ button {
   position: absolute;
 }
 
-.heart-bg::before {
-  top: -7px;
-  left: 0;
-}
-
-.heart-bg::after {
-  left: -7px;
-  top: 0;
-}
+.heart-bg::before { top: -7px; left: 0; }
+.heart-bg::after { left: -7px; top: 0; }
 
 @keyframes floatUp {
   from { transform: translateY(100vh) rotate(45deg); }
@@ -111,35 +98,33 @@ button {
   transition: transform 0.4s ease;
 }
 
-.gift:hover {
-  transform: scale(1.08);
+.gift:hover { transform: scale(1.08); }
+
+/* Puzzle */
+.puzzle-container {
+  width: 260px;
+  height: 260px;
+  margin: 30px auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
 }
 
+.puzzle-piece {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  background-image: url("photo1.jpg");
+  background-size: 200% 200%;
+  cursor: grab;
+}
+
+/* Reveal */
 .reveal img {
   width: 90%;
   max-width: 300px;
   border-radius: 16px;
   margin-top: 20px;
-}
-
-/* Puzzle */
-.puzzle {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 30px;
-}
-
-.piece {
-  width: 70px;
-  height: 70px;
-  background: #ffd6e0;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 28px;
-  cursor: grab;
 }
 
 /* Heart confetti */
@@ -162,15 +147,8 @@ button {
   position: absolute;
 }
 
-.heart-confetti::before {
-  top: -6px;
-  left: 0;
-}
-
-.heart-confetti::after {
-  left: -6px;
-  top: 0;
-}
+.heart-confetti::before { top: -6px; left: 0; }
+.heart-confetti::after { left: -6px; top: 0; }
 
 @keyframes explode {
   to {
@@ -190,9 +168,7 @@ button {
     <br>
     <small style="font-size:14px; opacity:0.6;">even from miles away 💌</small>
   </h1>
-
   <br><br>
-
   <button id="yesBtn">Yes 💖</button>
   <button id="noBtn">No 🙃</button>
 </div>
@@ -227,11 +203,12 @@ noBtn.addEventListener("mouseover", moveButton);
 noBtn.addEventListener("click", moveButton);
 
 function moveButton() {
-  noBtn.style.transform = `translate(${Math.random()*200-100}px, ${Math.random()*200-100}px)`;
+  noBtn.style.transform =
+    `translate(${Math.random()*200-100}px, ${Math.random()*200-100}px)`;
 }
 
 /* YES */
-document.getElementById("yesBtn").addEventListener("click", () => {
+yesBtn.addEventListener("click", () => {
   launchConfetti();
   setTimeout(() => {
     page1.classList.add("hidden");
@@ -259,13 +236,14 @@ function openGift(num) {
 
   if (num === 1) {
     reveal.innerHTML = `
-      <h2>Put the hearts in order 💗</h2>
-      <p>Arrange them from left to right</p>
+      <h2>Put the kitty back together 🐱🧩</h2>
+      <p>Drag the pieces until the picture is complete</p>
 
-      <div class="puzzle" id="puzzle">
-        <div class="piece" draggable="true">💗</div>
-        <div class="piece" draggable="true">💖</div>
-        <div class="piece" draggable="true">💘</div>
+      <div class="puzzle-container" id="puzzle">
+        <div class="puzzle-piece" data-pos="0"></div>
+        <div class="puzzle-piece" data-pos="1"></div>
+        <div class="puzzle-piece" data-pos="2"></div>
+        <div class="puzzle-piece" data-pos="3"></div>
       </div>
     `;
     initPuzzle();
@@ -280,31 +258,50 @@ function openGift(num) {
 
 /* Puzzle logic */
 function initPuzzle() {
-  const puzzle = document.getElementById("puzzle");
-  let dragged;
+  const pieces = document.querySelectorAll(".puzzle-piece");
+  const positions = ["0 0", "100% 0", "0 100%", "100% 100%"];
 
-  puzzle.querySelectorAll(".piece").forEach(piece => {
-    piece.addEventListener("dragstart", e => dragged = piece);
+  pieces.forEach((piece, i) => {
+    piece.style.backgroundPosition = positions[i];
+  });
+
+  // Shuffle
+  const shuffled = [...pieces].sort(() => Math.random() - 0.5);
+  const container = document.getElementById("puzzle");
+  container.innerHTML = "";
+  shuffled.forEach(p => container.appendChild(p));
+
+  let dragged = null;
+
+  pieces.forEach(piece => {
+    piece.draggable = true;
+
+    piece.addEventListener("dragstart", () => dragged = piece);
     piece.addEventListener("dragover", e => e.preventDefault());
-    piece.addEventListener("drop", e => {
-      e.preventDefault();
+    piece.addEventListener("drop", () => {
       if (dragged !== piece) {
-        const temp = dragged.innerHTML;
-        dragged.innerHTML = piece.innerHTML;
-        piece.innerHTML = temp;
-        checkPuzzle();
+        const temp = dragged.style.backgroundPosition;
+        dragged.style.backgroundPosition = piece.style.backgroundPosition;
+        piece.style.backgroundPosition = temp;
+        checkSolved();
       }
     });
   });
 }
 
-function checkPuzzle() {
-  const order = [...document.querySelectorAll(".piece")].map(p => p.innerHTML).join("");
-  if (order === "💗💖💘") {
+function checkSolved() {
+  const correct = ["0 0", "100% 0", "0 100%", "100% 100%"];
+  const pieces = document.querySelectorAll(".puzzle-piece");
+
+  const solved = [...pieces].every((p, i) =>
+    p.style.backgroundPosition === correct[i]
+  );
+
+  if (solved) {
     document.getElementById("reveal").innerHTML = `
-      <h2>You did it 🥹💗</h2>
+      <h2>You solved it 🥹💗</h2>
       <img src="photo1.jpg">
-      <p>Every piece falls into place when I’m with you.</p>
+      <p>Every piece fits perfectly — just like us.</p>
     `;
   }
 }
