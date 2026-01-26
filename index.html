@@ -79,16 +79,21 @@ button {
   grid-template-columns: repeat(3, 1fr);
   max-width: 300px;
   margin: 20px auto;
-  gap: 4px;
+  gap: 6px;
 }
 
 .tile {
   width: 100%;
-  aspect-ratio: 1/1;
+  aspect-ratio: 1 / 1;
   background-image: url('photo1.jpg');
   background-size: 300% 300%;
-  cursor: pointer;
-  border-radius: 8px;
+  border-radius: 10px;
+  cursor: grab;
+}
+
+.tile:active {
+  cursor: grabbing;
+  opacity: 0.7;
 }
 
 .hidden {
@@ -153,49 +158,53 @@ setInterval(() => {
 
 /* NAVIGATION */
 function goToGifts() {
-  document.getElementById("page1").classList.remove("active");
-  document.getElementById("page2").classList.add("active");
+  page1.classList.remove("active");
+  page2.classList.add("active");
 }
 
 function openPuzzle() {
-  document.getElementById("page2").classList.remove("active");
-  document.getElementById("page3").classList.add("active");
+  page2.classList.remove("active");
+  page3.classList.add("active");
   initPuzzle();
 }
 
-/* PUZZLE LOGIC (3x3) */
+/* DRAGGABLE PUZZLE */
 const size = 3;
-let tiles = [];
+let positions = [];
+let draggedIndex = null;
 
 function initPuzzle() {
   const puzzle = document.getElementById("puzzle");
   puzzle.innerHTML = "";
-  tiles = [...Array(size * size).keys()];
-  tiles.sort(() => Math.random() - 0.5);
+  positions = [...Array(size * size).keys()].sort(() => Math.random() - 0.5);
 
-  tiles.forEach((pos, index) => {
+  positions.forEach((pos, index) => {
     const tile = document.createElement("div");
     tile.className = "tile";
+    tile.draggable = true;
     tile.dataset.index = index;
 
     const x = pos % size;
     const y = Math.floor(pos / size);
     tile.style.backgroundPosition = `${(x / (size - 1)) * 100}% ${(y / (size - 1)) * 100}%`;
 
-    tile.onclick = () => swap(index);
+    tile.addEventListener("dragstart", () => draggedIndex = index);
+    tile.addEventListener("dragover", e => e.preventDefault());
+    tile.addEventListener("drop", () => swapTiles(index));
+
     puzzle.appendChild(tile);
   });
 }
 
-function swap(index) {
-  if (index === 0) return;
-  [tiles[index], tiles[0]] = [tiles[0], tiles[index]];
+function swapTiles(targetIndex) {
+  [positions[draggedIndex], positions[targetIndex]] =
+  [positions[targetIndex], positions[draggedIndex]];
   initPuzzle();
   checkSolved();
 }
 
 function checkSolved() {
-  const solved = tiles.every((v, i) => v === i);
+  const solved = positions.every((v, i) => v === i);
   if (solved) {
     document.getElementById("puzzleMessage").classList.remove("hidden");
   }
