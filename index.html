@@ -76,18 +76,19 @@ button {
 /* PUZZLE */
 #puzzle {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  max-width: 320px;
+  grid-template-columns: repeat(3, 1fr);
+  max-width: 300px;
   margin: 20px auto;
-  gap: 2px;
+  gap: 4px;
 }
 
 .tile {
   width: 100%;
   aspect-ratio: 1/1;
   background-image: url('photo1.jpg');
-  background-size: 600% 600%;
+  background-size: 300% 300%;
   cursor: pointer;
+  border-radius: 8px;
 }
 
 .hidden {
@@ -162,26 +163,20 @@ function openPuzzle() {
   initPuzzle();
 }
 
-/* PUZZLE LOGIC */
-const size = 6;
+/* PUZZLE LOGIC (3x3) */
+const size = 3;
 let tiles = [];
 
 function initPuzzle() {
   const puzzle = document.getElementById("puzzle");
   puzzle.innerHTML = "";
-  tiles = [];
-
-  for (let i = 0; i < size * size; i++) {
-    tiles.push(i);
-  }
-
+  tiles = [...Array(size * size).keys()];
   tiles.sort(() => Math.random() - 0.5);
 
   tiles.forEach((pos, index) => {
     const tile = document.createElement("div");
     tile.className = "tile";
-    tile.dataset.correct = index;
-    tile.dataset.current = pos;
+    tile.dataset.index = index;
 
     const x = pos % size;
     const y = Math.floor(pos / size);
