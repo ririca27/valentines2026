@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Be My Valentine 💕</title>
 
 <style>
@@ -10,31 +10,24 @@ body {
   margin: 0;
   font-family: 'Poppins', sans-serif;
   background: linear-gradient(180deg, #fff0f5, #ffffff);
-  overflow-x: hidden;
   text-align: center;
+  overflow-x: hidden;
 }
 
 /* HEART CONFETTI */
 .heart {
   position: fixed;
-  color: #ff5e8a;
-  font-size: 20px;
+  font-size: 18px;
   animation: float 6s linear infinite;
 }
 @keyframes float {
-  0% { transform: translateY(100vh); opacity: 1; }
-  100% { transform: translateY(-10vh); opacity: 0; }
+  from { transform: translateY(100vh); opacity: 1; }
+  to { transform: translateY(-10vh); opacity: 0; }
 }
 
 /* PAGES */
-.page {
-  display: none;
-  min-height: 100vh;
-  padding: 40px 20px;
-}
-.page.active {
-  display: block;
-}
+.page { display: none; min-height: 100vh; padding: 40px 20px; }
+.page.active { display: block; }
 
 /* BUTTONS */
 button {
@@ -45,33 +38,21 @@ button {
   cursor: pointer;
   margin: 10px;
 }
-
-.yes {
-  background: #ff5e8a;
-  color: white;
-}
-
-.no {
-  background: #f3f3f3;
-  position: absolute;
-}
+.yes { background: #ff5e8a; color: white; }
+.no { background: #f3f3f3; position: absolute; }
 
 /* GIFTS */
 .gifts {
   display: flex;
   justify-content: center;
   gap: 20px;
-  flex-wrap: wrap;
 }
-
 .gift {
   font-size: 60px;
   cursor: pointer;
   transition: transform 0.3s;
 }
-.gift:hover {
-  transform: scale(1.2);
-}
+.gift:hover { transform: scale(1.2); }
 
 /* PUZZLE */
 #puzzle {
@@ -83,22 +64,18 @@ button {
 }
 
 .tile {
-  width: 100%;
   aspect-ratio: 1 / 1;
-  background-image: url('photo1.jpg');
+  background-image: url("photo1.jpg");
   background-size: 300% 300%;
   border-radius: 10px;
   cursor: grab;
 }
 
-.tile:active {
-  cursor: grabbing;
-  opacity: 0.7;
+.tile.dragging {
+  opacity: 0.5;
 }
 
-.hidden {
-  display: none;
-}
+.hidden { display: none; }
 
 #puzzleMessage {
   margin-top: 20px;
@@ -149,9 +126,8 @@ noBtn.addEventListener("mouseover", () => {
 setInterval(() => {
   const heart = document.createElement("div");
   heart.className = "heart";
-  heart.innerHTML = "💗";
+  heart.textContent = "💗";
   heart.style.left = Math.random() * 100 + "vw";
-  heart.style.fontSize = Math.random() * 20 + 10 + "px";
   document.body.appendChild(heart);
   setTimeout(() => heart.remove(), 6000);
 }, 300);
@@ -161,50 +137,72 @@ function goToGifts() {
   page1.classList.remove("active");
   page2.classList.add("active");
 }
-
 function openPuzzle() {
   page2.classList.remove("active");
   page3.classList.add("active");
   initPuzzle();
 }
 
-/* DRAGGABLE PUZZLE */
+/* STABLE DRAG PUZZLE (3x3) */
 const size = 3;
-let positions = [];
-let draggedIndex = null;
+let order = [];
+let draggedTile = null;
 
 function initPuzzle() {
   const puzzle = document.getElementById("puzzle");
   puzzle.innerHTML = "";
-  positions = [...Array(size * size).keys()].sort(() => Math.random() - 0.5);
 
-  positions.forEach((pos, index) => {
+  order = [...Array(size * size).keys()];
+  order.sort(() => Math.random() - 0.5);
+
+  order.forEach((pos, i) => {
     const tile = document.createElement("div");
     tile.className = "tile";
     tile.draggable = true;
-    tile.dataset.index = index;
+    tile.dataset.correct = pos;
 
     const x = pos % size;
     const y = Math.floor(pos / size);
-    tile.style.backgroundPosition = `${(x / (size - 1)) * 100}% ${(y / (size - 1)) * 100}%`;
+    tile.style.backgroundPosition =
+      `${(x / (size - 1)) * 100}% ${(y / (size - 1)) * 100}%`;
 
-    tile.addEventListener("dragstart", () => draggedIndex = index);
+    tile.addEventListener("dragstart", () => {
+      draggedTile = tile;
+      tile.classList.add("dragging");
+    });
+
+    tile.addEventListener("dragend", () => {
+      tile.classList.remove("dragging");
+      draggedTile = null;
+    });
+
     tile.addEventListener("dragover", e => e.preventDefault());
-    tile.addEventListener("drop", () => swapTiles(index));
+
+    tile.addEventListener("drop", () => {
+      if (!draggedTile || draggedTile === tile) return;
+
+      const draggedNext = draggedTile.nextSibling === tile
+        ? draggedTile
+        : draggedTile.nextSibling === tile.nextSibling
+          ? draggedTile
+          : draggedTile;
+
+      puzzle.insertBefore(draggedTile, tile);
+      puzzle.insertBefore(tile, draggedNext);
+
+      checkSolved();
+    });
 
     puzzle.appendChild(tile);
   });
 }
 
-function swapTiles(targetIndex) {
-  [positions[draggedIndex], positions[targetIndex]] =
-  [positions[targetIndex], positions[draggedIndex]];
-  initPuzzle();
-  checkSolved();
-}
-
 function checkSolved() {
-  const solved = positions.every((v, i) => v === i);
+  const tiles = [...document.querySelectorAll(".tile")];
+  const solved = tiles.every((tile, i) =>
+    Number(tile.dataset.correct) === i
+  );
+
   if (solved) {
     document.getElementById("puzzleMessage").classList.remove("hidden");
   }
