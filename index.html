@@ -54,7 +54,7 @@ button {
 }
 .gift:hover { transform: scale(1.2); }
 
-/* PUZZLE */
+/* PUZZLE (UNCHANGED) */
 #puzzle {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -62,7 +62,6 @@ button {
   margin: 20px auto;
   gap: 6px;
 }
-
 .tile {
   aspect-ratio: 1 / 1;
   background-image: url("photo1.jpg");
@@ -70,10 +69,7 @@ button {
   border-radius: 10px;
   cursor: grab;
 }
-
-.tile.dragging {
-  opacity: 0.5;
-}
+.tile.dragging { opacity: 0.5; }
 
 .hidden { display: none; }
 
@@ -81,6 +77,47 @@ button {
   margin-top: 20px;
   font-size: 18px;
   color: #ff5e8a;
+}
+
+/* QUIZ */
+.quiz-box {
+  max-width: 500px;
+  margin: 30px auto;
+}
+
+.choice {
+  background: #fff;
+  border: 2px solid #ffd1dc;
+  padding: 14px;
+  border-radius: 16px;
+  margin: 10px 0;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.choice:hover {
+  background: #fff0f5;
+}
+
+.meter {
+  margin: 20px auto;
+  width: 260px;
+  height: 18px;
+  background: #eee;
+  border-radius: 20px;
+  overflow: hidden;
+}
+.meter-fill {
+  height: 100%;
+  width: 50%;
+  background: linear-gradient(90deg, #ff7676, #ffd56b, #7bed9f);
+  transition: width 0.6s ease;
+}
+
+.meter-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 18px;
+  margin-bottom: 5px;
 }
 </style>
 </head>
@@ -100,12 +137,12 @@ button {
   <h2>Choose a gift 🎁</h2>
   <div class="gifts">
     <div class="gift" onclick="openPuzzle()">🎁</div>
-    <div class="gift">🎁</div>
+    <div class="gift" onclick="openQuiz()">🎁</div>
     <div class="gift">🎁</div>
   </div>
 </div>
 
-<!-- PAGE 3 -->
+<!-- PAGE 3 – PUZZLE -->
 <div class="page" id="page3">
   <h2>Put it together 🧩</h2>
   <div id="puzzle"></div>
@@ -114,9 +151,23 @@ button {
   </div>
 </div>
 
+<!-- PAGE 4 – QUIZ -->
+<div class="page" id="page4">
+  <h2>Now is the time for a quiz 💗</h2>
+
+  <div class="meter-labels">
+    <span>😠</span>
+    <span>😄</span>
+  </div>
+  <div class="meter">
+    <div class="meter-fill" id="meterFill"></div>
+  </div>
+
+  <div class="quiz-box" id="quizBox"></div>
+</div>
+
 <script>
 /* MOVING NO BUTTON */
-const noBtn = document.getElementById("noBtn");
 noBtn.addEventListener("mouseover", () => {
   noBtn.style.left = Math.random() * 80 + "vw";
   noBtn.style.top = Math.random() * 80 + "vh";
@@ -132,7 +183,7 @@ setInterval(() => {
   setTimeout(() => heart.remove(), 6000);
 }, 300);
 
-/* NAVIGATION */
+/* NAV */
 function goToGifts() {
   page1.classList.remove("active");
   page2.classList.add("active");
@@ -142,20 +193,22 @@ function openPuzzle() {
   page3.classList.add("active");
   initPuzzle();
 }
+function openQuiz() {
+  page2.classList.remove("active");
+  page4.classList.add("active");
+  showQuestion();
+}
 
-/* STABLE DRAG PUZZLE (3x3) */
+/* PUZZLE (UNCHANGED) */
 const size = 3;
 let order = [];
 let draggedTile = null;
 
 function initPuzzle() {
-  const puzzle = document.getElementById("puzzle");
   puzzle.innerHTML = "";
+  order = [...Array(size * size).keys()].sort(() => Math.random() - 0.5);
 
-  order = [...Array(size * size).keys()];
-  order.sort(() => Math.random() - 0.5);
-
-  order.forEach((pos, i) => {
+  order.forEach(pos => {
     const tile = document.createElement("div");
     tile.className = "tile";
     tile.draggable = true;
@@ -166,30 +219,11 @@ function initPuzzle() {
     tile.style.backgroundPosition =
       `${(x / (size - 1)) * 100}% ${(y / (size - 1)) * 100}%`;
 
-    tile.addEventListener("dragstart", () => {
-      draggedTile = tile;
-      tile.classList.add("dragging");
-    });
-
-    tile.addEventListener("dragend", () => {
-      tile.classList.remove("dragging");
-      draggedTile = null;
-    });
-
+    tile.addEventListener("dragstart", () => draggedTile = tile);
     tile.addEventListener("dragover", e => e.preventDefault());
-
     tile.addEventListener("drop", () => {
       if (!draggedTile || draggedTile === tile) return;
-
-      const draggedNext = draggedTile.nextSibling === tile
-        ? draggedTile
-        : draggedTile.nextSibling === tile.nextSibling
-          ? draggedTile
-          : draggedTile;
-
       puzzle.insertBefore(draggedTile, tile);
-      puzzle.insertBefore(tile, draggedNext);
-
       checkSolved();
     });
 
@@ -199,13 +233,62 @@ function initPuzzle() {
 
 function checkSolved() {
   const tiles = [...document.querySelectorAll(".tile")];
-  const solved = tiles.every((tile, i) =>
-    Number(tile.dataset.correct) === i
-  );
+  const solved = tiles.every((t, i) => Number(t.dataset.correct) === i);
+  if (solved) puzzleMessage.classList.remove("hidden");
+}
 
-  if (solved) {
-    document.getElementById("puzzleMessage").classList.remove("hidden");
+/* QUIZ LOGIC */
+const quiz = [
+  { q: "When is my birthday?", a: "June 22, 1998",
+    o: ["June 22, 1998","June 10, 1998","July 22, 1998","June 30, 1998"] },
+  { q: "What is my nickname?", a: "Bebe",
+    o: ["Bebe","Baby","Bee","Bb"] },
+  { q: "When was the first time we talked on Instagram?",
+    a: "March 2, 2024",
+    o: ["March 2, 2024","March 12, 2024","February 28, 2024","March 5, 2024"] },
+  { q: "When was the first time you said \"I love you\"?",
+    a: "June 3, 2024",
+    o: ["June 3, 2024","June 10, 2024","May 30, 2024","June 7, 2024"] },
+  { q: "When was the first time I told you \"I love you\"?",
+    a: "July 23, 2024",
+    o: ["July 23, 2024","July 15, 2024","July 30, 2024","August 1, 2024"] },
+  { q: "When did we became MU?",
+    a: "April 27, 2024",
+    o: ["April 27, 2024","April 20, 2024","May 1, 2024","April 30, 2024"] }
+];
+
+let qIndex = 0;
+let meter = 50;
+
+function showQuestion() {
+  const box = document.getElementById("quizBox");
+  box.innerHTML = "";
+
+  if (qIndex >= quiz.length) {
+    box.innerHTML = "<h3>💖 You really know us 💖</h3>";
+    return;
   }
+
+  const q = quiz[qIndex];
+  const h = document.createElement("h3");
+  h.textContent = q.q;
+  box.appendChild(h);
+
+  q.o.forEach(choice => {
+    const btn = document.createElement("div");
+    btn.className = "choice";
+    btn.textContent = choice;
+    btn.onclick = () => answer(choice === q.a);
+    box.appendChild(btn);
+  });
+}
+
+function answer(correct) {
+  meter += correct ? 10 : -10;
+  meter = Math.max(0, Math.min(100, meter));
+  document.getElementById("meterFill").style.width = meter + "%";
+  qIndex++;
+  setTimeout(showQuestion, 600);
 }
 </script>
 
