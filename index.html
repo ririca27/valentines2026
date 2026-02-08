@@ -2,351 +2,222 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Be My Valentine 💕</title>
-
+<title>Three Gifts for You 💖</title>
 <style>
 body {
-  margin: 0;
-  font-family: 'Poppins', sans-serif;
-  background: linear-gradient(180deg, #fff0f5, #ffffff);
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #ffd6e8, #ffeef5);
   text-align: center;
-  overflow-x: hidden;
+  padding: 20px;
 }
 
-/* HEART CONFETTI */
-.heart {
-  position: fixed;
-  font-size: 18px;
-  animation: float 6s linear infinite;
-}
-@keyframes float {
-  from { transform: translateY(100vh); opacity: 1; }
-  to { transform: translateY(-10vh); opacity: 0; }
+h1 {
+  color: #ff4d88;
 }
 
-/* EXPLODING ANGER */
-.explode {
-  animation: boom 0.6s ease forwards;
-}
-@keyframes boom {
-  0% { transform: scale(1); opacity: 1; }
-  60% { transform: scale(2.5) rotate(20deg); }
-  100% { transform: scale(0); opacity: 0; }
-}
-
-/* PAGES */
-.page { display: none; min-height: 100vh; padding: 40px 20px; }
-.page.active { display: block; }
-
-/* BUTTONS */
-button {
-  padding: 14px 26px;
-  border-radius: 30px;
-  border: none;
-  font-size: 16px;
-  cursor: pointer;
-  margin: 10px;
-}
-.yes { background: #ff5e8a; color: white; }
-.no { background: #f3f3f3; position: absolute; }
-
-/* GIFTS */
 .gifts {
   display: flex;
   justify-content: center;
-  gap: 25px;
+  gap: 20px;
+  margin-top: 30px;
 }
+
 .gift {
-  font-size: 60px;
+  width: 120px;
+  height: 120px;
+  background: #ff85b3;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
   cursor: pointer;
-  transition: transform 0.3s;
+  color: white;
+  transition: 0.3s;
 }
-.gift.done {
-  opacity: 0.6;
-  transform: scale(0.9);
-}
-.gift:hover { transform: scale(1.2); }
 
-/* PUZZLE (UNCHANGED) */
-#puzzle {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  max-width: 300px;
-  margin: 20px auto;
-  gap: 6px;
+.gift.locked {
+  background: #bbb;
+  cursor: not-allowed;
 }
-.tile {
-  aspect-ratio: 1/1;
-  background-image: url("favpicofyou.jpg");
-  background-size: 300% 300%;
+
+.section {
+  display: none;
+  margin-top: 30px;
+}
+
+button {
+  padding: 10px 20px;
+  border: none;
   border-radius: 10px;
-  cursor: grab;
+  background: #ff4d88;
+  color: white;
+  cursor: pointer;
+  margin-top: 15px;
 }
-.hidden { display: none; }
-
-/* QUIZ */
-.quiz-box { max-width: 520px; margin: 30px auto; }
 
 .choice {
+  display: block;
+  margin: 10px auto;
+  padding: 10px;
+  width: 260px;
   background: #fff;
-  border: 2px solid #ffd1dc;
-  padding: 14px;
-  border-radius: 16px;
-  margin: 10px 0;
+  border-radius: 10px;
   cursor: pointer;
-  transition: all 0.3s;
 }
-.choice:hover { background: #fff0f5; }
 
-/* METER */
-.meter-area { margin: 20px auto; max-width: 300px; }
 .meter {
-  height: 18px;
-  background: #eee;
-  border-radius: 20px;
-  overflow: hidden;
+  font-size: 40px;
+  margin: 15px;
 }
-.meter-fill {
-  height: 100%;
-  width: 50%;
-  background: linear-gradient(90deg, #ff7676, #ffd56b, #7bed9f);
-  transition: width 0.6s ease;
-}
-.emoji-row {
-  display: flex;
-  justify-content: space-between;
-  font-size: 26px;
-  margin-bottom: 5px;
-}
-.emoji {
-  transition: transform 0.4s ease;
-}
-.big { transform: scale(1.6); }
 
-/* RESULT */
-.result img {
-  max-width: 200px;
+.explode {
+  animation: boom 0.6s ease-out forwards;
+}
+
+@keyframes boom {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(3); opacity: 0; }
+}
+
+.jar {
+  font-size: 80px;
+  cursor: pointer;
+}
+
+.reason {
   margin-top: 20px;
+  font-size: 20px;
+  color: #d6336c;
 }
 </style>
 </head>
-
 <body>
 
-<!-- PAGE 1 -->
-<div class="page active" id="page1">
-  <h1>💖 Can you be my Valentine? 💖</h1>
-  <button class="yes" onclick="goToGifts()">Yes 💘</button>
-  <button class="no" id="noBtn">No 🙃</button>
+<h1>🎁 Three Gifts for You 🎁</h1>
+
+<div class="gifts">
+  <div class="gift" id="gift1" onclick="openGift(1)">🎁</div>
+  <div class="gift" id="gift2" onclick="openGift(2)">🎁</div>
+  <div class="gift" id="gift3" onclick="openGift(3)">🎁</div>
 </div>
 
-<!-- PAGE 2 -->
-<div class="page" id="page2">
-  <h2>Choose a gift 🎁</h2>
-  <div class="gifts">
-    <div class="gift" id="gift1" onclick="openPuzzle()">🎁</div>
-    <div class="gift" id="gift2" onclick="openQuiz()">🎁</div>
-    <div class="gift">🎁</div>
-  </div>
+<!-- GIFT 1 -->
+<div class="section" id="section1">
+  <h2>Gift 1: Puzzle 💕</h2>
+  <p>You already completed this before 😉</p>
+  <button onclick="completeGift(1)">Finish Puzzle</button>
 </div>
 
-<!-- PAGE 3 – PUZZLE (UNCHANGED) -->
-<div class="page" id="page3">
-  <h2>Put it together 🧩</h2>
-  <h3>Drag and drop the puzzle piece to its correct position</h3>
-  <div id="puzzle"></div>
-  <p id="puzzleMessage" class="hidden">💕 This is my favorite picture of you 💕</p>
+<!-- GIFT 2 -->
+<div class="section" id="section2">
+  <h2>Now is the time for a quiz 📝</h2>
+  <div class="meter" id="meter">😄</div>
+  <div id="question"></div>
+  <div id="choices"></div>
 </div>
 
-<!-- PAGE 4 – QUIZ -->
-<div class="page" id="page4">
-  <h2>Now is the time for a quiz 💗<br>Please answer these 10 questions</h2>
-
-  <div class="meter-area">
-    <div class="emoji-row">
-      <span id="angry" class="emoji">😠</span>
-      <span id="happy" class="emoji">😄</span>
-    </div>
-    <div class="meter">
-      <div class="meter-fill" id="meterFill"></div>
-    </div>
-  </div>
-
-  <div class="quiz-box" id="quizBox"></div>
+<!-- GIFT 3 -->
+<div class="section" id="section3">
+  <h2>Why I Love You Jar 💖</h2>
+  <div class="jar" onclick="pullReason()">🍯</div>
+  <div class="reason" id="reason"></div>
 </div>
-<script>
-/* ========= GIFT 1 – PUZZLE (RESTORED) ========= */
-
-function openPuzzle(){
-  page2.classList.remove("active");
-  page3.classList.add("active");
-  initPuzzle();
-}
-
-function initPuzzle(){
-  const puzzle = document.getElementById("puzzle");
-  puzzle.innerHTML = "";
-  document.getElementById("puzzleMessage").classList.add("hidden");
-
-  const positions = [...Array(9).keys()].sort(()=>Math.random()-0.5);
-
-  positions.forEach((pos, i)=>{
-    const tile = document.createElement("div");
-    tile.className = "tile";
-    tile.draggable = true;
-    tile.dataset.correct = i;
-    tile.dataset.current = pos;
-
-    tile.style.backgroundPosition =
-      `${-(pos % 3) * 100}% ${-Math.floor(pos / 3) * 100}%`;
-
-    tile.addEventListener("dragstart", dragStart);
-    tile.addEventListener("dragover", e => e.preventDefault());
-    tile.addEventListener("drop", dropTile);
-
-    puzzle.appendChild(tile);
-  });
-}
-
-let draggedTile = null;
-
-function dragStart(e){
-  draggedTile = e.target;
-}
-
-function dropTile(e){
-  const target = e.target;
-  if (!draggedTile || draggedTile === target) return;
-
-  const temp = draggedTile.style.backgroundPosition;
-  draggedTile.style.backgroundPosition = target.style.backgroundPosition;
-  target.style.backgroundPosition = temp;
-
-  const tempPos = draggedTile.dataset.current;
-  draggedTile.dataset.current = target.dataset.current;
-  target.dataset.current = tempPos;
-
-  checkPuzzle();
-}
-
-function checkPuzzle(){
-  const tiles = document.querySelectorAll(".tile");
-  const solved = [...tiles].every(t => t.dataset.current == t.dataset.correct);
-
-  if(solved){
-    document.getElementById("puzzleMessage").classList.remove("hidden");
-    setTimeout(()=>backToGifts("gift1"),3000);
-  }
-}
-</script>
 
 <script>
-/* MOVING NO */
-noBtn.onmouseover = () => {
-  noBtn.style.left = Math.random()*80 + "vw";
-  noBtn.style.top = Math.random()*80 + "vh";
-};
+let completed = JSON.parse(localStorage.getItem("completed")) || [];
 
-/* CONFETTI */
-setInterval(() => {
-  const h = document.createElement("div");
-  h.className = "heart";
-  h.textContent = "💗";
-  h.style.left = Math.random()*100 + "vw";
-  document.body.appendChild(h);
-  setTimeout(()=>h.remove(),6000);
-},300);
-
-/* NAV */
-function goToGifts() {
-  page1.classList.remove("active");
-  page2.classList.add("active");
-}
-function backToGifts(id) {
-  document.getElementById(id).classList.add("done");
-  page4.classList.remove("active");
-  page3.classList.remove("active");
-  page2.classList.add("active");
+function openGift(num) {
+  if (completed.includes(num)) return;
+  document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+  document.getElementById('section' + num).style.display = 'block';
 }
 
-/* QUIZ DATA */
+function completeGift(num) {
+  completed.push(num);
+  localStorage.setItem("completed", JSON.stringify(completed));
+  document.getElementById('gift' + num).classList.add('locked');
+  document.getElementById('section' + num).style.display = 'none';
+}
+
+/* ---------- GIFT 2 QUIZ ---------- */
+let meter = 3;
+const meterEl = document.getElementById("meter");
+
 const quiz = [
- {q:"When is my birthday?",a:"June 22, 1998",o:["June 22, 1998","June 10, 1998","July 22, 1998","June 30, 1998"]},
- {q:"What is my nickname?",a:"Bebe",o:["Bebe","Baby","Bee","Bb"]},
- {q:"When was the first time we talked on Instagram?",a:"March 2, 2024",o:["March 2, 2024","March 5, 2024","Feb 28, 2024","March 12, 2024"]},
- {q:"When was the first time you said \"I love you\"?",a:"June 3, 2024",o:["June 3, 2024","June 7, 2024","May 30, 2024","June 10, 2024"]},
- {q:"When was the first time I told you \"I love you\"?",a:"July 23, 2024",o:["July 23, 2024","July 15, 2024","July 30, 2024","Aug 1, 2024"]},
- {q:"When did we became MU?",a:"April 27, 2024",o:["April 27, 2024","April 20, 2024","May 1, 2024","April 30, 2024"]},
- {q:"When was our first video call?",a:"September 14, 2024",o:["September 14, 2024","Sept 10, 2024","Sept 20, 2024","Sept 1, 2024"]},
- {q:"When was the first time you held my hand?",a:"October 9, 2025",o:["October 9, 2025","October 5, 2025","October 15, 2025","October 1, 2025"]},
- {q:"When was our first kiss?",a:"October 10, 2025",o:["October 10, 2025","October 12, 2025","October 8, 2025","October 15, 2025"]},
- {q:"When did we became officially together?",a:"January 1, 2026",o:["January 1, 2026","Feb 1, 2026","Dec 31, 2025","Jan 15, 2026"]}
+  { q: "When is my birthday?", a: "June 22, 1998", c: ["June 10, 1998", "June 18, 1998", "June 30, 1998"] },
+  { q: "What is my nickname?", a: "Bebe", c: ["Baby", "Love", "BB"] },
+  { q: "When was the first time we talked on Instagram?", a: "March 2, 2024", c: ["March 10, 2024", "March 15, 2024", "March 20, 2024"] },
+  { q: "When was the first time you said I love you?", a: "June 3, 2024", c: ["June 10, 2024", "June 15, 2024", "June 20, 2024"] },
+  { q: "When was the first time I told you I love you?", a: "July 23, 2024", c: ["July 10, 2024", "July 15, 2024", "July 30, 2024"] },
+  { q: "When did we became MU?", a: "April 27, 2024", c: ["April 10, 2024", "April 15, 2024", "April 30, 2024"] }
 ];
 
-let qi = 0, meter = 50;
+let qi = 0;
 
-function shuffle(arr){
-  return arr.sort(()=>Math.random()-0.5);
-}
-
-function openQuiz(){
-  page2.classList.remove("active");
-  page4.classList.add("active");
-  showQ();
-}
-
-function showQ(){
-  quizBox.innerHTML="";
-  if(qi>=quiz.length){
-    finishQuiz();
+function loadQuestion() {
+  if (qi >= quiz.length) {
+    completeGift(2);
     return;
   }
-  const q=quiz[qi];
-  quizBox.innerHTML=`<h3>${q.q}</h3>`;
-  shuffle([...q.o]).forEach(c=>{
-    const d=document.createElement("div");
-    d.className="choice";
-    d.textContent=c;
-    d.onclick=()=>answer(c===q.a);
-    quizBox.appendChild(d);
+
+  const q = quiz[qi];
+  document.getElementById("question").innerText = q.q;
+
+  let choices = [...q.c, q.a].sort(() => Math.random() - 0.5);
+  const choicesDiv = document.getElementById("choices");
+  choicesDiv.innerHTML = "";
+
+  choices.forEach(choice => {
+    const div = document.createElement("div");
+    div.className = "choice";
+    div.innerText = choice;
+    div.onclick = () => checkAnswer(choice === q.a);
+    choicesDiv.appendChild(div);
   });
 }
 
-function answer(ok){
-  meter += ok ? 10 : -10;
-  meter = Math.max(0, Math.min(100, meter));
-  meterFill.style.width = meter + "%";
+function checkAnswer(correct) {
+  if (correct) {
+    meter = Math.min(5, meter + 1);
+    meterEl.textContent = "😄";
+    qi++;
+    loadQuestion();
+  } else {
+    meter--;
+    meterEl.textContent = "😡";
+    if (meter <= 0) {
+      meterEl.classList.add("explode");
+      document.getElementById("choices").innerHTML =
+        "You forget about me 😿<br>You don't love me";
+    }
+  }
+}
 
-  angry.classList.toggle("big", meter < 50);
-  happy.classList.toggle("big", meter > 50);
+loadQuestion();
 
-  if(meter === 0){
-    angry.classList.add("explode");
-    quizBox.innerHTML = `<div class="result">
-      <h3>You forget about me 😿<br>You don't love me</h3>
-      <img src="Sad.gif">
-    </div>`;
-    setTimeout(()=>backToGifts("gift2"),4000);
+/* ---------- GIFT 3 LOVE JAR ---------- */
+let reasons = [
+  "Because you make me feel safe",
+  "Because you listen to me",
+  "Because you choose me",
+  "Because you are patient with me",
+  "Because you are my home",
+  "Because you love me in ways I understand"
+];
+
+function pullReason() {
+  if (reasons.length === 0) {
+    completeGift(3);
     return;
   }
-
-  qi++;
-  setTimeout(showQ,600);
+  const i = Math.floor(Math.random() * reasons.length);
+  document.getElementById("reason").innerText = reasons.splice(i, 1)[0];
 }
 
-function finishQuiz(){
-  quizBox.innerHTML = `<div class="result">
-    <h3>I love you so much 💖</h3>
-    <img src="happy.gif">
-  </div>`;
-  setTimeout(()=>backToGifts("gift2"),4000);
-}
+/* Lock completed gifts on load */
+completed.forEach(n => document.getElementById('gift' + n).classList.add('locked'));
 </script>
 
 </body>
 </html>
-
-
-
-
