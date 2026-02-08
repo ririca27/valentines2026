@@ -64,6 +64,7 @@ button {
 
 .meter span {
   font-size: 42px;
+  transition: transform 0.3s;
   position: relative;
 }
 
@@ -112,17 +113,13 @@ button {
   </div>
 </div>
 
-<!-- ================= -->
 <!-- GIFT 1 (UNCHANGED) -->
-<!-- ================= -->
 <div id="gift1Page" class="hidden">
-  <!-- YOUR ORIGINAL PUZZLE CODE STAYS HERE -->
+  <!-- Your existing puzzle stays here -->
   <!-- Call completeGift(1) when finished -->
 </div>
 
-<!-- ================= -->
-<!-- GIFT 2 (QUIZ) -->
-<!-- ================= -->
+<!-- GIFT 2 -->
 <div id="gift2Page" class="hidden">
   <h2>Now is the time for a quiz 💌<br>Please answer these 10 questions</h2>
 
@@ -134,10 +131,8 @@ button {
   <div id="quiz"></div>
 </div>
 
-<div id="resultPage" class="hidden"></div>
-
 <script>
-/* RUNAWAY NO BUTTON */
+/* Runaway No button */
 noBtn.onmouseover = () => {
   noBtn.style.left = Math.random() * 80 + "%";
   noBtn.style.top = Math.random() * 80 + "%";
@@ -148,12 +143,8 @@ yesBtn.onclick = () => {
   giftsPage.classList.remove("hidden");
 };
 
-/* GIFT STATE */
-const completed = {
-  1: false,
-  2: false,
-  3: false
-};
+/* Gift state */
+const completed = {1:false,2:false,3:false};
 
 gift1.onclick = () => openGift(1);
 gift2.onclick = () => openGift(2);
@@ -161,14 +152,11 @@ gift3.onclick = () => openGift(3);
 
 function openGift(n){
   if(completed[n]) return;
-
   giftsPage.classList.add("hidden");
   document.getElementById(`gift${n}Page`).classList.remove("hidden");
-
   if(n === 2) startQuiz();
 }
 
-/* MARK GIFT COMPLETE */
 function completeGift(n){
   completed[n] = true;
   document.getElementById(`gift${n}`).classList.add("completed");
@@ -177,7 +165,7 @@ function completeGift(n){
 }
 
 /* ================= */
-/* QUIZ LOGIC (GIFT 2) */
+/* QUIZ (GIFT 2) */
 /* ================= */
 
 let angerLevel = 5;
@@ -197,7 +185,7 @@ const questions = [
   { q:"When did we became officially together?", correct:"January 1, 2026", choices:["February 1, 2026","March 1, 2026","December 25, 2025"] }
 ];
 
-function shuffle(a){ return a.sort(()=>Math.random()-0.5); }
+function shuffle(arr){ return arr.sort(()=>Math.random()-0.5); }
 
 function startQuiz(){
   angerLevel = 5;
@@ -235,14 +223,21 @@ function explode(target){
 function answer(selected){
   const q = questions[current];
 
-  if(selected !== q.correct){
+  if(selected === q.correct){
+    happyLevel++;
+    happy.style.transform = "scale(1.4)";
+    setTimeout(()=>happy.style.transform="scale(1)",300);
+  } else {
     angerLevel--;
-    if(angerLevel <= 0){
-      explode(anger);
-      quiz.innerHTML = `<h2>You forget about me 😿<br>You don't love me</h2>`;
-      setTimeout(()=>completeGift(2),2500);
-      return;
-    }
+    anger.style.transform = "scale(1.4)";
+    setTimeout(()=>anger.style.transform="scale(1)",300);
+  }
+
+  if(angerLevel <= 0){
+    explode(anger);
+    quiz.innerHTML = `<h2>You forget about me 😿<br>You don't love me</h2>`;
+    setTimeout(()=>completeGift(2),2500);
+    return;
   }
 
   current++;
