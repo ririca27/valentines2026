@@ -43,12 +43,16 @@ button {
   justify-content: center;
   font-size: 40px;
   cursor: pointer;
+  transition: transform 0.3s;
 }
 
 .gift.completed {
   background: #ffd1dc;
-  opacity: 0.7;
+  opacity: 0.6;
+  pointer-events: none;
 }
+
+.gift:hover { transform: scale(1.05); }
 
 .meter {
   display: flex;
@@ -60,7 +64,6 @@ button {
 
 .meter span {
   font-size: 42px;
-  transition: transform 0.3s;
   position: relative;
 }
 
@@ -70,24 +73,20 @@ button {
   width: 80%;
 }
 
-/* 🔴 subtle particle explosion */
+/* subtle particle explosion */
 .particle {
   position: absolute;
   width: 6px;
   height: 6px;
   background: #ff5e8a;
   border-radius: 50%;
-  pointer-events: none;
   animation: explode 600ms ease-out forwards;
 }
 
 @keyframes explode {
-  from {
-    transform: translate(0,0) scale(1);
-    opacity: 1;
-  }
+  from { transform: translate(0,0); opacity: 1; }
   to {
-    transform: translate(var(--x), var(--y)) scale(0.3);
+    transform: translate(var(--x), var(--y));
     opacity: 0;
   }
 }
@@ -103,7 +102,7 @@ button {
   <button id="noBtn">No</button>
 </div>
 
-<!-- GIFTS -->
+<!-- GIFTS PAGE -->
 <div id="giftsPage" class="hidden">
   <h2>Choose a gift 🎁</h2>
   <div class="gifts">
@@ -113,10 +112,17 @@ button {
   </div>
 </div>
 
-<!-- GIFT 1 (UNCHANGED / YOUR EXISTING PUZZLE GOES HERE) -->
-<div id="gift1Page" class="hidden"></div>
+<!-- ================= -->
+<!-- GIFT 1 (UNCHANGED) -->
+<!-- ================= -->
+<div id="gift1Page" class="hidden">
+  <!-- YOUR ORIGINAL PUZZLE CODE STAYS HERE -->
+  <!-- Call completeGift(1) when finished -->
+</div>
 
-<!-- GIFT 2 -->
+<!-- ================= -->
+<!-- GIFT 2 (QUIZ) -->
+<!-- ================= -->
 <div id="gift2Page" class="hidden">
   <h2>Now is the time for a quiz 💌<br>Please answer these 10 questions</h2>
 
@@ -131,7 +137,7 @@ button {
 <div id="resultPage" class="hidden"></div>
 
 <script>
-/* No button runs away */
+/* RUNAWAY NO BUTTON */
 noBtn.onmouseover = () => {
   noBtn.style.left = Math.random() * 80 + "%";
   noBtn.style.top = Math.random() * 80 + "%";
@@ -142,11 +148,37 @@ yesBtn.onclick = () => {
   giftsPage.classList.remove("hidden");
 };
 
-gift2.onclick = () => {
-  giftsPage.classList.add("hidden");
-  gift2Page.classList.remove("hidden");
-  startQuiz();
+/* GIFT STATE */
+const completed = {
+  1: false,
+  2: false,
+  3: false
 };
+
+gift1.onclick = () => openGift(1);
+gift2.onclick = () => openGift(2);
+gift3.onclick = () => openGift(3);
+
+function openGift(n){
+  if(completed[n]) return;
+
+  giftsPage.classList.add("hidden");
+  document.getElementById(`gift${n}Page`).classList.remove("hidden");
+
+  if(n === 2) startQuiz();
+}
+
+/* MARK GIFT COMPLETE */
+function completeGift(n){
+  completed[n] = true;
+  document.getElementById(`gift${n}`).classList.add("completed");
+  document.getElementById(`gift${n}Page`).classList.add("hidden");
+  giftsPage.classList.remove("hidden");
+}
+
+/* ================= */
+/* QUIZ LOGIC (GIFT 2) */
+/* ================= */
 
 let angerLevel = 5;
 let happyLevel = 5;
@@ -165,9 +197,7 @@ const questions = [
   { q:"When did we became officially together?", correct:"January 1, 2026", choices:["February 1, 2026","March 1, 2026","December 25, 2025"] }
 ];
 
-function shuffle(arr){
-  return arr.sort(() => Math.random() - 0.5);
-}
+function shuffle(a){ return a.sort(()=>Math.random()-0.5); }
 
 function startQuiz(){
   angerLevel = 5;
@@ -181,7 +211,7 @@ function showQuestion(){
   const answers = shuffle([q.correct, ...q.choices]);
 
   quiz.innerHTML = `
-    <h3>Question ${current + 1}</h3>
+    <h3>Question ${current+1}</h3>
     <p>${q.q}</p>
     <div class="answers">
       ${answers.map(a =>
@@ -195,8 +225,8 @@ function explode(target){
   for(let i=0;i<12;i++){
     const p = document.createElement("div");
     p.className = "particle";
-    p.style.setProperty("--x", `${(Math.random()*80-40)}px`);
-    p.style.setProperty("--y", `${(Math.random()*80-40)}px`);
+    p.style.setProperty("--x", `${Math.random()*80-40}px`);
+    p.style.setProperty("--y", `${Math.random()*80-40}px`);
     target.appendChild(p);
     setTimeout(()=>p.remove(),600);
   }
@@ -205,38 +235,23 @@ function explode(target){
 function answer(selected){
   const q = questions[current];
 
-  if(selected === q.correct){
-    happyLevel++;
-    happy.style.transform = "scale(1.5)";
-    setTimeout(()=>happy.style.transform="scale(1)",300);
-  } else {
+  if(selected !== q.correct){
     angerLevel--;
-    anger.style.transform = "scale(1.5)";
-    setTimeout(()=>anger.style.transform="scale(1)",300);
-  }
-
-  if(angerLevel <= 0){
-    explode(anger);
-    quiz.innerHTML = `
-      <h2>You forget about me 😿<br>You don't love me</h2>
-    `;
-    setTimeout(returnToGifts, 2500);
-    return;
+    if(angerLevel <= 0){
+      explode(anger);
+      quiz.innerHTML = `<h2>You forget about me 😿<br>You don't love me</h2>`;
+      setTimeout(()=>completeGift(2),2500);
+      return;
+    }
   }
 
   current++;
   if(current < questions.length){
-    setTimeout(showQuestion, 400);
+    showQuestion();
   } else {
     quiz.innerHTML = `<h2>I love you so much 💖🎉</h2>`;
-    setTimeout(returnToGifts, 2500);
+    setTimeout(()=>completeGift(2),2500);
   }
-}
-
-function returnToGifts(){
-  gift2.classList.add("completed");
-  gift2Page.classList.add("hidden");
-  giftsPage.classList.remove("hidden");
 }
 </script>
 
