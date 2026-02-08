@@ -3,121 +3,83 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Be My Valentine 💕</title>
+<title>Be My Valentine 💘</title>
 
 <style>
 body {
   margin: 0;
   font-family: 'Poppins', sans-serif;
-  background: linear-gradient(180deg, #fff0f5, #ffffff);
+  background: linear-gradient(180deg, #fff0f5, #ffe4ec);
   text-align: center;
   overflow-x: hidden;
 }
 
-/* HEART CONFETTI */
-.heart {
-  position: fixed;
-  font-size: 18px;
-  animation: float 6s linear infinite;
-}
-@keyframes float {
-  from { transform: translateY(100vh); opacity: 1; }
-  to { transform: translateY(-10vh); opacity: 0; }
-}
+.hidden { display: none; }
 
-/* PAGES */
-.page { display: none; min-height: 100vh; padding: 40px 20px; }
-.page.active { display: block; }
-
-/* BUTTONS */
 button {
-  padding: 14px 26px;
-  border-radius: 30px;
+  padding: 12px 22px;
+  border-radius: 20px;
   border: none;
   font-size: 16px;
   cursor: pointer;
-  margin: 10px;
 }
-.yes { background: #ff5e8a; color: white; }
-.no { background: #f3f3f3; position: absolute; }
 
-/* GIFTS */
+#yesBtn { background: #ff5e8a; color: white; }
+#noBtn { background: #ddd; position: absolute; }
+
 .gifts {
   display: flex;
   justify-content: center;
-  gap: 25px;
+  gap: 20px;
+  margin-top: 40px;
 }
+
 .gift {
-  font-size: 60px;
+  width: 120px;
+  height: 120px;
+  background: #ffb6c1;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
   cursor: pointer;
   transition: transform 0.3s;
 }
-.gift.done {
-  opacity: 0.6;
-  transform: scale(0.9);
-}
-.gift:hover { transform: scale(1.2); }
 
-/* PUZZLE (UNCHANGED) */
-#puzzle {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  max-width: 300px;
-  margin: 20px auto;
-  gap: 6px;
+.gift.completed {
+  background: #ffd1dc;
+  opacity: 0.7;
 }
-.tile {
-  aspect-ratio: 1/1;
-  background-image: url("photo1.jpg");
-  background-size: 300% 300%;
-  border-radius: 10px;
-  cursor: grab;
-}
-.hidden { display: none; }
 
-/* QUIZ */
-.quiz-box { max-width: 520px; margin: 30px auto; }
+.gift:hover { transform: scale(1.05); }
 
-.choice {
-  background: #fff;
-  border: 2px solid #ffd1dc;
-  padding: 14px;
-  border-radius: 16px;
-  margin: 10px 0;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-.choice:hover { background: #fff0f5; }
-
-/* METER */
-.meter-area { margin: 20px auto; max-width: 300px; }
 .meter {
-  height: 18px;
-  background: #eee;
-  border-radius: 20px;
-  overflow: hidden;
-}
-.meter-fill {
-  height: 100%;
-  width: 50%;
-  background: linear-gradient(90deg, #ff7676, #ffd56b, #7bed9f);
-  transition: width 0.6s ease;
-}
-.emoji-row {
   display: flex;
-  justify-content: space-between;
-  font-size: 26px;
-  margin-bottom: 5px;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin: 20px 0;
 }
-.emoji {
-  transition: transform 0.4s ease;
-}
-.big { transform: scale(1.6); }
 
-/* RESULT */
-.result img {
-  max-width: 200px;
-  margin-top: 20px;
+.meter span {
+  font-size: 40px;
+  transition: transform 0.4s;
+}
+
+.answers button {
+  display: block;
+  margin: 10px auto;
+  width: 80%;
+}
+
+.confetti {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
 </style>
 </head>
@@ -125,133 +87,151 @@ button {
 <body>
 
 <!-- PAGE 1 -->
-<div class="page active" id="page1">
-  <h1>💖 Can you be my Valentine? 💖</h1>
-  <button class="yes" onclick="goToGifts()">Yes 💘</button>
-  <button class="no" id="noBtn">No 🙃</button>
+<div id="page1">
+  <h1>Can you be my Valentine? 💖</h1>
+  <button id="yesBtn">Yes</button>
+  <button id="noBtn">No</button>
 </div>
 
-<!-- PAGE 2 -->
-<div class="page" id="page2">
+<!-- GIFTS PAGE -->
+<div id="giftsPage" class="hidden">
   <h2>Choose a gift 🎁</h2>
   <div class="gifts">
-    <div class="gift" id="gift1" onclick="openPuzzle()">🎁</div>
-    <div class="gift" id="gift2" onclick="openQuiz()">🎁</div>
-    <div class="gift">🎁</div>
+    <div class="gift" id="gift1">🎁</div>
+    <div class="gift" id="gift2">🎁</div>
+    <div class="gift" id="gift3">🎁</div>
   </div>
 </div>
 
-<!-- PAGE 3 – PUZZLE (UNCHANGED) -->
-<div class="page" id="page3">
-  <h2>Put it together 🧩</h2>
-  <div id="puzzle"></div>
-  <p id="puzzleMessage" class="hidden">💕 This is my favorite picture of you 💕</p>
+<!-- ===================== -->
+<!-- GIFT 1 (UNCHANGED) -->
+<!-- ===================== -->
+<div id="gift1Page" class="hidden">
+  <!-- YOUR EXISTING PUZZLE CODE STAYS EXACTLY THE SAME -->
 </div>
 
-<!-- PAGE 4 – QUIZ -->
-<div class="page" id="page4">
-  <h2>Now is the time for a quiz 💗<br>Please answer these 10 questions</h2>
+<!-- ===================== -->
+<!-- GIFT 2 – QUIZ GAME -->
+<!-- ===================== -->
+<div id="gift2Page" class="hidden">
+  <h2>Now is the time for a quiz 💌<br>Please answer these 10 questions</h2>
 
-  <div class="meter-area">
-    <div class="emoji-row">
-      <span id="angry" class="emoji">😠</span>
-      <span id="happy" class="emoji">😄</span>
-    </div>
-    <div class="meter">
-      <div class="meter-fill" id="meterFill"></div>
-    </div>
+  <div class="meter">
+    <span id="anger">😾</span>
+    <span id="happy">😍</span>
   </div>
 
-  <div class="quiz-box" id="quizBox"></div>
+  <div id="quiz"></div>
 </div>
+
+<!-- RESULT -->
+<div id="resultPage" class="hidden"></div>
 
 <script>
-/* MOVING NO */
-noBtn.onmouseover = () => {
-  noBtn.style.left = Math.random()*80 + "vw";
-  noBtn.style.top = Math.random()*80 + "vh";
+/* NO BUTTON RUNS AWAY */
+const noBtn = document.getElementById('noBtn');
+noBtn.addEventListener('mouseover', () => {
+  noBtn.style.left = Math.random() * 80 + "%";
+  noBtn.style.top = Math.random() * 80 + "%";
+});
+
+/* YES */
+document.getElementById('yesBtn').onclick = () => {
+  page1.classList.add('hidden');
+  giftsPage.classList.remove('hidden');
 };
 
-/* CONFETTI */
-setInterval(() => {
-  const h = document.createElement("div");
-  h.className = "heart";
-  h.textContent = "💗";
-  h.style.left = Math.random()*100 + "vw";
-  document.body.appendChild(h);
-  setTimeout(()=>h.remove(),6000);
-},300);
+/* GIFT CLICK */
+gift2.onclick = () => {
+  giftsPage.classList.add('hidden');
+  gift2Page.classList.remove('hidden');
+  startQuiz();
+};
 
-/* NAV */
-function goToGifts() {
-  page1.classList.remove("active");
-  page2.classList.add("active");
-}
-function backToGifts(id) {
-  document.getElementById(id).classList.add("done");
-  page4.classList.remove("active");
-  page3.classList.remove("active");
-  page2.classList.add("active");
-}
+let angerLevel = 5;
+let happyLevel = 5;
 
-/* QUIZ DATA */
-const quiz = [
- {q:"When is my birthday?",a:"June 22, 1998",o:["June 22, 1998","June 10, 1998","July 22, 1998","June 30, 1998"]},
- {q:"What is my nickname?",a:"Bebe",o:["Bebe","Baby","Bee","Bb"]},
- {q:"When was the first time we talked on Instagram?",a:"March 2, 2024",o:["March 2, 2024","March 5, 2024","Feb 28, 2024","March 12, 2024"]},
- {q:"When was the first time you said \"I love you\"?",a:"June 3, 2024",o:["June 3, 2024","June 7, 2024","May 30, 2024","June 10, 2024"]},
- {q:"When was the first time I told you \"I love you\"?",a:"July 23, 2024",o:["July 23, 2024","July 15, 2024","July 30, 2024","Aug 1, 2024"]},
- {q:"When did we became MU?",a:"April 27, 2024",o:["April 27, 2024","April 20, 2024","May 1, 2024","April 30, 2024"]},
- {q:"When was our first video call?",a:"September 14, 2024",o:["September 14, 2024","Sept 10, 2024","Sept 20, 2024","Sept 1, 2024"]},
- {q:"When was the first time you held my hand?",a:"October 9, 2025",o:["October 9, 2025","October 5, 2025","October 15, 2025","October 1, 2025"]},
- {q:"When was our first kiss?",a:"October 10, 2025",o:["October 10, 2025","October 12, 2025","October 8, 2025","October 15, 2025"]},
- {q:"When did we became officially together?",a:"January 1, 2026",o:["January 1, 2026","Feb 1, 2026","Dec 31, 2025","Jan 15, 2026"]}
+const questions = [
+  {q:"When is my birthday?", a:"June 22, 1998", o:["June 10, 1998","June 18, 1998","June 25, 1998"]},
+  {q:"What is my nickname?", a:"Bebe", o:["Baby","Beh","Love"]},
+  {q:"When was the first time we talked on Instagram?", a:"March 2, 2024", o:["March 5, 2024","March 10, 2024","March 18, 2024"]},
+  {q:"When was the first time you said I love you?", a:"June 3, 2024", o:["June 10, 2024","June 15, 2024","June 20, 2024"]},
+  {q:"When was the first time I told you I love you?", a:"July 23, 2024", o:["July 10, 2024","July 15, 2024","July 30, 2024"]},
+  {q:"When did we became MU?", a:"April 27, 2024", o:["April 10, 2024","April 15, 2024","April 30, 2024"]},
+  {q:"When was our first video call?", a:"September 14, 2024", o:["September 5, 2024","September 20, 2024","September 25, 2024"]},
+  {q:"When was the first time you held my hand?", a:"October 9, 2025", o:["October 1, 2025","October 5, 2025","October 20, 2025"]},
+  {q:"When was our first kiss?", a:"October 10, 2025", o:["October 3, 2025","October 15, 2025","October 20, 2025"]},
+  {q:"When did we became officially together?", a:"January 1, 2026", o:["February 1, 2026","March 1, 2026","December 25, 2025"]}
 ];
 
-let qi=0, meter=50;
+let index = 0;
 
-function openQuiz(){
-  page2.classList.remove("active");
-  page4.classList.add("active");
-  showQ();
+function shuffle(arr){
+  return arr.sort(() => Math.random() - 0.5);
 }
 
-function showQ(){
-  const box=quizBox;
-  box.innerHTML="";
-  if(qi>=quiz.length){
+function startQuiz(){
+  angerLevel = 5;
+  happyLevel = 5;
+  index = 0;
+  showQuestion();
+}
+
+function showQuestion(){
+  if(index >= questions.length){
     finishQuiz();
     return;
   }
-  const q=quiz[qi];
-  box.innerHTML=`<h3>${q.q}</h3>`;
-  q.o.forEach(c=>{
-    const d=document.createElement("div");
-    d.className="choice";
-    d.textContent=c;
-    d.onclick=()=>answer(c===q.a);
-    box.appendChild(d);
-  });
+
+  const q = questions[index];
+  const allAnswers = shuffle([q.a, ...q.o]);
+
+  quiz.innerHTML = `
+    <h3>Question ${index+1}</h3>
+    <p>${q.q}</p>
+    <div class="answers">
+      ${allAnswers.map(a => `<button onclick="answer('${a}','${q.a}')">${a}</button>`).join("")}
+    </div>
+  `;
 }
 
-function answer(ok){
-  meter+= ok?10:-10;
-  meter=Math.max(0,Math.min(100,meter));
-  meterFill.style.width=meter+"%";
-  angry.classList.toggle("big",meter<50);
-  happy.classList.toggle("big",meter>50);
-  qi++;
-  setTimeout(showQ,600);
+function answer(selected, correct){
+  if(selected === correct){
+    happyLevel++;
+    happy.style.transform = "scale(1.5)";
+    setTimeout(()=>happy.style.transform="scale(1)",300);
+  } else {
+    angerLevel--;
+    anger.style.transform = "scale(1.5)";
+    setTimeout(()=>anger.style.transform="scale(1)",300);
+  }
+
+  if(angerLevel <= 0){
+    resultPage.innerHTML = `<h2>😿 You forget about me<br>You don't love me</h2>`;
+    endGame();
+    return;
+  }
+
+  index++;
+  setTimeout(showQuestion, 400);
 }
 
 function finishQuiz(){
-  quizBox.innerHTML="";
-  if(meter<50){
-    quizBox.innerHTML=`<div class="result"><h3>You forget about me 😿<br>You don't love me</h3><img src="Sad.gif"></div>`;
-  }else{
-    quizBox.innerHTML=`<div class="result"><h3>I love you so much 💖</h3><img src="Iloveyousomuch.gif"></div>`;
-  }
-  setTimeout(()=>backToGifts("gift2"),4000);
+  resultPage.innerHTML = `
+    <h2>I love you so much 💖</h2>
+    <p>🎉🎉🎉</p>
+  `;
+  endGame();
+}
+
+function endGame(){
+  gift2.classList.add("completed");
+  gift2Page.classList.add("hidden");
+  resultPage.classList.remove("hidden");
+  setTimeout(()=>{
+    resultPage.classList.add("hidden");
+    giftsPage.classList.remove("hidden");
+  },3000);
 }
 </script>
 
