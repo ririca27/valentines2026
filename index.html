@@ -174,6 +174,71 @@ button {
 
   <div class="quiz-box" id="quizBox"></div>
 </div>
+<script>
+/* ========= GIFT 1 – PUZZLE (RESTORED) ========= */
+
+function openPuzzle(){
+  page2.classList.remove("active");
+  page3.classList.add("active");
+  initPuzzle();
+}
+
+function initPuzzle(){
+  const puzzle = document.getElementById("puzzle");
+  puzzle.innerHTML = "";
+  document.getElementById("puzzleMessage").classList.add("hidden");
+
+  const positions = [...Array(9).keys()].sort(()=>Math.random()-0.5);
+
+  positions.forEach((pos, i)=>{
+    const tile = document.createElement("div");
+    tile.className = "tile";
+    tile.draggable = true;
+    tile.dataset.correct = i;
+    tile.dataset.current = pos;
+
+    tile.style.backgroundPosition =
+      `${-(pos % 3) * 100}% ${-Math.floor(pos / 3) * 100}%`;
+
+    tile.addEventListener("dragstart", dragStart);
+    tile.addEventListener("dragover", e => e.preventDefault());
+    tile.addEventListener("drop", dropTile);
+
+    puzzle.appendChild(tile);
+  });
+}
+
+let draggedTile = null;
+
+function dragStart(e){
+  draggedTile = e.target;
+}
+
+function dropTile(e){
+  const target = e.target;
+  if (!draggedTile || draggedTile === target) return;
+
+  const temp = draggedTile.style.backgroundPosition;
+  draggedTile.style.backgroundPosition = target.style.backgroundPosition;
+  target.style.backgroundPosition = temp;
+
+  const tempPos = draggedTile.dataset.current;
+  draggedTile.dataset.current = target.dataset.current;
+  target.dataset.current = tempPos;
+
+  checkPuzzle();
+}
+
+function checkPuzzle(){
+  const tiles = document.querySelectorAll(".tile");
+  const solved = [...tiles].every(t => t.dataset.current == t.dataset.correct);
+
+  if(solved){
+    document.getElementById("puzzleMessage").classList.remove("hidden");
+    setTimeout(()=>backToGifts("gift1"),3000);
+  }
+}
+</script>
 
 <script>
 /* MOVING NO */
@@ -259,7 +324,7 @@ function answer(ok){
     angry.classList.add("explode");
     quizBox.innerHTML = `<div class="result">
       <h3>You forget about me 😿<br>You don't love me</h3>
-      <img src="sadcat.jpg">
+      <img src="Sad.gif">
     </div>`;
     setTimeout(()=>backToGifts("gift2"),4000);
     return;
@@ -280,3 +345,4 @@ function finishQuiz(){
 
 </body>
 </html>
+
