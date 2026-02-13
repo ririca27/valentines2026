@@ -3,87 +3,131 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Valentine</title>
+<title>Be My Valentine 💕</title>
 
 <style>
 body {
-  margin:0;
-  font-family:'Arial', sans-serif;
-  text-align:center;
-  background:linear-gradient(to bottom right,#ffdde1,#ee9ca7);
-  overflow-x:hidden;
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(180deg, #fff0f5, #ffffff);
+  text-align: center;
+  overflow-x: hidden;
 }
 
-.hidden { display:none; }
+/* HEART CONFETTI */
+.heart {
+  position: fixed;
+  font-size: 18px;
+  animation: float 6s linear infinite;
+}
+@keyframes float {
+  from { transform: translateY(100vh); opacity: 1; }
+  to { transform: translateY(-10vh); opacity: 0; }
+}
 
+/* EXPLODING ANGER */
+.explode {
+  animation: boom 0.6s ease forwards;
+}
+@keyframes boom {
+  0% { transform: scale(1); opacity: 1; }
+  60% { transform: scale(2.5) rotate(20deg); }
+  100% { transform: scale(0); opacity: 0; }
+}
+
+/* PAGES */
+.page { display: none; min-height: 100vh; padding: 40px 20px; }
+.page.active { display: block; }
+
+/* BUTTONS */
 button {
-  padding:12px 25px;
-  border:none;
-  border-radius:25px;
-  background:#ff4d6d;
-  color:white;
-  font-size:16px;
-  cursor:pointer;
-  margin:10px;
+  padding: 14px 26px;
+  border-radius: 30px;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  margin: 10px;
 }
+.yes { background: #ff5e8a; color: white; }
+.no { background: #f3f3f3; position: absolute; }
 
-button:hover { opacity:0.8; }
-
-.gift-container {
-  display:flex;
-  justify-content:center;
-  gap:30px;
-  margin-top:50px;
-  flex-wrap:wrap;
+/* GIFTS */
+.gifts {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
 }
-
 .gift {
-  font-size:60px;
-  cursor:pointer;
-  transition:0.3s;
+  font-size: 60px;
+  cursor: pointer;
+  transition: transform 0.3s;
 }
-
-.gift.completed {
-  opacity:0.5;
-  pointer-events:none;
+.gift.done {
+  opacity: 0.6;
+  transform: scale(0.9);
 }
+.gift:hover { transform: scale(1.2); }
 
+/* PUZZLE (UNCHANGED) */
 #puzzle {
-  width:300px;
-  height:300px;
-  margin:20px auto;
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  grid-template-rows:repeat(3,1fr);
-  gap:2px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  max-width: 300px;
+  margin: 20px auto;
+  gap: 6px;
 }
+.tile {
+  aspect-ratio: 1/1;
+  background-image: url("favpicofyou.jpg");
+  background-size: 300% 300%;
+  border-radius: 10px;
+  cursor: grab;
+}
+.hidden { display: none; }
 
-.piece {
-  width:100%;
-  height:100%;
-  background-size:300px 300px;
-  cursor:pointer;
-}
-
-.meter {
-  font-size:40px;
-  margin:20px;
-}
+/* QUIZ */
+.quiz-box { max-width: 520px; margin: 30px auto; }
 
 .choice {
-  display:block;
-  margin:10px auto;
-  padding:10px;
-  width:250px;
-  border-radius:20px;
-  background:white;
-  cursor:pointer;
+  background: #fff;
+  border: 2px solid #ffd1dc;
+  padding: 14px;
+  border-radius: 16px;
+  margin: 10px 0;
+  cursor: pointer;
+  transition: all 0.3s;
 }
+.choice:hover { background: #fff0f5; }
 
-.jar-box {
-  margin-top:30px;
-  font-size:20px;
-  min-height:60px;
+/* METER */
+.meter-area { margin: 20px auto; max-width: 300px; }
+.meter {
+  height: 18px;
+  background: #eee;
+  border-radius: 20px;
+  overflow: hidden;
+}
+.meter-fill {
+  height: 100%;
+  width: 50%;
+  background: linear-gradient(90deg, #ff7676, #ffd56b, #7bed9f);
+  transition: width 0.6s ease;
+}
+.emoji-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 26px;
+  margin-bottom: 5px;
+}
+.emoji {
+  transition: transform 0.4s ease;
+}
+.big { transform: scale(1.6); }
+
+/* RESULT */
+.result img {
+  max-width: 200px;
+  margin-top: 20px;
 }
 </style>
 </head>
@@ -91,250 +135,217 @@ button:hover { opacity:0.8; }
 <body>
 
 <!-- PAGE 1 -->
-<div id="intro">
-  <h1>Can you be my Valentine? 💖</h1>
-  <button onclick="startGifts()">Yes of course!</button>
+<div class="page active" id="page1">
+  <h1>💖 Can you be my Valentine? 💖</h1>
+  <button class="yes" onclick="goToGifts()">Yes 💘</button>
+  <button class="no" id="noBtn">No 🙃</button>
 </div>
 
-<!-- GIFT PAGE -->
-<div id="giftPage" class="hidden">
-  <h2>Choose your gift 🎁</h2>
-  <div class="gift-container">
-    <div class="gift" id="gift1" onclick="openGift(1)">🎁</div>
-    <div class="gift" id="gift2" onclick="openGift(2)">🎁</div>
-    <div class="gift" id="gift3" onclick="openGift(3)">🎁</div>
+<!-- PAGE 2 -->
+<div class="page" id="page2">
+  <h2>Choose a gift 🎁</h2>
+  <div class="gifts">
+    <div class="gift" id="gift1" onclick="openPuzzle()">🎁</div>
+    <div class="gift" id="gift2" onclick="openQuiz()">🎁</div>
+    <div class="gift">🎁</div>
   </div>
 </div>
 
-<!-- GIFT 1 -->
-<div id="gift1Content" class="hidden">
-  <h2>Put the picture together 💕</h2>
+<!-- PAGE 3 – PUZZLE (UNCHANGED) -->
+<div class="page" id="page3">
+  <h2>Put it together 🧩</h2>
+  <h3>Drag and drop the puzzle piece to its correct position</h3>
   <div id="puzzle"></div>
-  <p id="puzzleMessage"></p>
+  <p id="puzzleMessage" class="hidden">💕 This is my favorite picture of you 💕</p>
 </div>
 
-<!-- GIFT 2 -->
-<div id="gift2Content" class="hidden">
-  <h2 id="quizTitle"></h2>
-  <div class="meter">
-    <span id="happy">😊</span>
-    <span id="anger">😡</span>
+<!-- PAGE 4 – QUIZ -->
+<div class="page" id="page4">
+  <h2>Now is the time for a quiz 💗<br>Please answer these 10 questions</h2>
+
+  <div class="meter-area">
+    <div class="emoji-row">
+      <span id="angry" class="emoji">😠</span>
+      <span id="happy" class="emoji">😄</span>
+    </div>
+    <div class="meter">
+      <div class="meter-fill" id="meterFill"></div>
+    </div>
   </div>
-  <div id="questionBox"></div>
-</div>
 
-<!-- GIFT 3 -->
-<div id="gift3Content" class="hidden">
-  <h2>Why I Love You Jar 💌</h2>
-  <button onclick="showReason()">Open a reason</button>
-  <div class="jar-box" id="reasonText"></div>
-  <button onclick="finishGift(3)">Back to Gifts</button>
+  <div class="quiz-box" id="quizBox"></div>
 </div>
-
 <script>
-let completed = {1:false,2:false,3:false};
+/* ========= GIFT 1 – PUZZLE (RESTORED) ========= */
 
-function startGifts(){
-  document.getElementById("intro").classList.add("hidden");
-  document.getElementById("giftPage").classList.remove("hidden");
+function openPuzzle(){
+  page2.classList.remove("active");
+  page3.classList.add("active");
+  initPuzzle();
 }
-
-function openGift(num){
-  document.getElementById("giftPage").classList.add("hidden");
-  document.getElementById("gift"+num+"Content").classList.remove("hidden");
-
-  if(num===1) initPuzzle();
-  if(num===2) startQuiz();
-}
-
-function finishGift(num){
-  completed[num]=true;
-  document.getElementById("gift"+num).classList.add("completed");
-
-  document.getElementById("gift"+num+"Content").classList.add("hidden");
-  document.getElementById("giftPage").classList.remove("hidden");
-}
-
-/////////////////////////////////////////////////
-// GIFT 1 PUZZLE
-/////////////////////////////////////////////////
-
-const imageURL = "YOUR_CAT_IMAGE_URL_HERE";
 
 function initPuzzle(){
-  const puzzle=document.getElementById("puzzle");
-  puzzle.innerHTML="";
-  let pieces=[];
-  for(let i=0;i<9;i++){
-    pieces.push(i);
-  }
-  pieces.sort(()=>Math.random()-0.5);
+  const puzzle = document.getElementById("puzzle");
+  puzzle.innerHTML = "";
+  document.getElementById("puzzleMessage").classList.add("hidden");
 
-  pieces.forEach(i=>{
-    const div=document.createElement("div");
-    div.className="piece";
-    div.draggable=true;
-    div.dataset.index=i;
-    div.style.backgroundImage=`url(${imageURL})`;
-    div.style.backgroundPosition=`${-(i%3)*100}px ${-Math.floor(i/3)*100}px`;
+  const positions = [...Array(9).keys()].sort(()=>Math.random()-0.5);
 
-    div.addEventListener("dragstart",dragStart);
-    div.addEventListener("dragover",dragOver);
-    div.addEventListener("drop",drop);
+  positions.forEach((pos, i)=>{
+    const tile = document.createElement("div");
+    tile.className = "tile";
+    tile.draggable = true;
+    tile.dataset.correct = i;
+    tile.dataset.current = pos;
 
-    puzzle.appendChild(div);
+    tile.style.backgroundPosition =
+      `${-(pos % 3) * 100}% ${-Math.floor(pos / 3) * 100}%`;
+
+    tile.addEventListener("dragstart", dragStart);
+    tile.addEventListener("dragover", e => e.preventDefault());
+    tile.addEventListener("drop", dropTile);
+
+    puzzle.appendChild(tile);
   });
 }
 
-let dragged;
+let draggedTile = null;
 
-function dragStart(){
-  dragged=this;
+function dragStart(e){
+  draggedTile = e.target;
 }
 
-function dragOver(e){
-  e.preventDefault();
+function dropTile(e){
+  const target = e.target;
+  if (!draggedTile || draggedTile === target) return;
+
+  const temp = draggedTile.style.backgroundPosition;
+  draggedTile.style.backgroundPosition = target.style.backgroundPosition;
+  target.style.backgroundPosition = temp;
+
+  const tempPos = draggedTile.dataset.current;
+  draggedTile.dataset.current = target.dataset.current;
+  target.dataset.current = tempPos;
+
+  checkPuzzle();
 }
 
-function drop(){
-  let temp=this.style.backgroundPosition;
-  this.style.backgroundPosition=dragged.style.backgroundPosition;
-  dragged.style.backgroundPosition=temp;
+function checkPuzzle(){
+  const tiles = document.querySelectorAll(".tile");
+  const solved = [...tiles].every(t => t.dataset.current == t.dataset.correct);
 
-  checkWin();
-}
-
-function checkWin(){
-  const pieces=document.querySelectorAll(".piece");
-  let correct=true;
-  pieces.forEach((piece,i)=>{
-    const correctPos=`${-(i%3)*100}px ${-Math.floor(i/3)*100}px`;
-    if(piece.style.backgroundPosition!==correctPos){
-      correct=false;
-    }
-  });
-
-  if(correct){
-    document.getElementById("puzzleMessage").innerHTML=
-    "This is my favorite picture of you 💕";
-    setTimeout(()=>finishGift(1),2000);
+  if(solved){
+    document.getElementById("puzzleMessage").classList.remove("hidden");
+    setTimeout(()=>backToGifts("gift1"),3000);
   }
 }
+</script>
 
-/////////////////////////////////////////////////
-// GIFT 2 QUIZ
-/////////////////////////////////////////////////
+<script>
+/* MOVING NO */
+noBtn.onmouseover = () => {
+  noBtn.style.left = Math.random()*80 + "vw";
+  noBtn.style.top = Math.random()*80 + "vh";
+};
 
-let quizIndex=0;
-let happiness=5;
-let anger=5;
+/* CONFETTI */
+setInterval(() => {
+  const h = document.createElement("div");
+  h.className = "heart";
+  h.textContent = "💗";
+  h.style.left = Math.random()*100 + "vw";
+  document.body.appendChild(h);
+  setTimeout(()=>h.remove(),6000);
+},300);
 
-const quiz=[
-{q:"When is my birthday?",
-a:["June 22, 1998","May 22, 1998","June 12, 1998","July 22, 1998"],
-c:"June 22, 1998"},
-{q:"What is my nickname?",
-a:["Bebe","Baby","Love","Honey"],
-c:"Bebe"},
-{q:"When was the first time we talked on Instagram?",
-a:["March 2, 2024","March 5, 2024","April 2, 2024","February 2, 2024"],
-c:"March 2, 2024"},
-{q:"When was the first time you said I love you?",
-a:["June 3, 2024","June 5, 2024","July 3, 2024","May 3, 2024"],
-c:"June 3, 2024"},
-{q:"When was the first time I told you I love you?",
-a:["July 23, 2024","July 20, 2024","August 23, 2024","June 23, 2024"],
-c:"July 23, 2024"},
-{q:"When did we became MU?",
-a:["April 27, 2024","April 20, 2024","May 27, 2024","March 27, 2024"],
-c:"April 27, 2024"},
-{q:"When was our first video call?",
-a:["September 14, 2024","September 10, 2024","October 14, 2024","August 14, 2024"],
-c:"September 14, 2024"},
-{q:"When was the first time you held my hand?",
-a:["October 9, 2025","October 5, 2025","September 9, 2025","November 9, 2025"],
-c:"October 9, 2025"},
-{q:"When was our first kiss?",
-a:["October 10, 2025","October 8, 2025","November 10, 2025","September 10, 2025"],
-c:"October 10, 2025"},
-{q:"When did we became officially together?",
-a:["January 1, 2026","January 2, 2026","February 1, 2026","December 31, 2025"],
-c:"January 1, 2026"}
+/* NAV */
+function goToGifts() {
+  page1.classList.remove("active");
+  page2.classList.add("active");
+}
+function backToGifts(id) {
+  document.getElementById(id).classList.add("done");
+  page4.classList.remove("active");
+  page3.classList.remove("active");
+  page2.classList.add("active");
+}
+
+/* QUIZ DATA */
+const quiz = [
+ {q:"When is my birthday?",a:"June 22, 1998",o:["June 22, 1998","June 10, 1998","July 22, 1998","June 30, 1998"]},
+ {q:"What is my nickname?",a:"Bebe",o:["Bebe","Baby","Bee","Bb"]},
+ {q:"When was the first time we talked on Instagram?",a:"March 2, 2024",o:["March 2, 2024","March 5, 2024","Feb 28, 2024","March 12, 2024"]},
+ {q:"When was the first time you said \"I love you\"?",a:"June 3, 2024",o:["June 3, 2024","June 7, 2024","May 30, 2024","June 10, 2024"]},
+ {q:"When was the first time I told you \"I love you\"?",a:"July 23, 2024",o:["July 23, 2024","July 15, 2024","July 30, 2024","Aug 1, 2024"]},
+ {q:"When did we became MU?",a:"April 27, 2024",o:["April 27, 2024","April 20, 2024","May 1, 2024","April 30, 2024"]},
+ {q:"When was our first video call?",a:"September 14, 2024",o:["September 14, 2024","Sept 10, 2024","Sept 20, 2024","Sept 1, 2024"]},
+ {q:"When was the first time you held my hand?",a:"October 9, 2025",o:["October 9, 2025","October 5, 2025","October 15, 2025","October 1, 2025"]},
+ {q:"When was our first kiss?",a:"October 10, 2025",o:["October 10, 2025","October 12, 2025","October 8, 2025","October 15, 2025"]},
+ {q:"When did we became officially together?",a:"January 1, 2026",o:["January 1, 2026","Feb 1, 2026","Dec 31, 2025","Jan 15, 2026"]}
 ];
 
-function startQuiz(){
-  quizIndex=0;
-  happiness=5;
-  anger=5;
-  document.getElementById("quizTitle").innerText=
-  "Now is the time for a quiz. Please answer these 10 questions 💌";
-  showQuestion();
+let qi = 0, meter = 50;
+
+function shuffle(arr){
+  return arr.sort(()=>Math.random()-0.5);
 }
 
-function showQuestion(){
-  if(quizIndex>=quiz.length){
-    if(happiness>=anger){
-      alert("I love you so much 🎉");
-    }else{
-      alert("You forget about me 😿 You don't love me");
-    }
-    finishGift(2);
+function openQuiz(){
+  page2.classList.remove("active");
+  page4.classList.add("active");
+  showQ();
+}
+
+function showQ(){
+  quizBox.innerHTML="";
+  if(qi>=quiz.length){
+    finishQuiz();
+    return;
+  }
+  const q=quiz[qi];
+  quizBox.innerHTML=`<h3>${q.q}</h3>`;
+  shuffle([...q.o]).forEach(c=>{
+    const d=document.createElement("div");
+    d.className="choice";
+    d.textContent=c;
+    d.onclick=()=>answer(c===q.a);
+    quizBox.appendChild(d);
+  });
+}
+
+function answer(ok){
+  meter += ok ? 10 : -10;
+  meter = Math.max(0, Math.min(100, meter));
+  meterFill.style.width = meter + "%";
+
+  angry.classList.toggle("big", meter < 50);
+  happy.classList.toggle("big", meter > 50);
+
+  if(meter === 0){
+    angry.classList.add("explode");
+    quizBox.innerHTML = `<div class="result">
+      <h3>You forget about me 😿<br>You don't love me</h3>
+      <img src="Sad.gif">
+    </div>`;
+    setTimeout(()=>backToGifts("gift2"),4000);
     return;
   }
 
-  const q=quiz[quizIndex];
-  const box=document.getElementById("questionBox");
-  box.innerHTML="<h3>"+q.q+"</h3>";
-
-  let answers=[...q.a];
-  answers.sort(()=>Math.random()-0.5);
-
-  answers.forEach(ans=>{
-    const div=document.createElement("div");
-    div.className="choice";
-    div.innerText=ans;
-    div.onclick=()=>selectAnswer(ans,q.c);
-    box.appendChild(div);
-  });
-
-  updateMeter();
+  qi++;
+  setTimeout(showQ,600);
 }
 
-function selectAnswer(ans,correct){
-  if(ans===correct){
-    happiness++;
-  }else{
-    anger++;
-  }
-  quizIndex++;
-  showQuestion();
-}
-
-function updateMeter(){
-  document.getElementById("happy").style.fontSize=happiness*8+"px";
-  document.getElementById("anger").style.fontSize=anger*8+"px";
-}
-
-/////////////////////////////////////////////////
-// GIFT 3 JAR
-/////////////////////////////////////////////////
-
-const reasons=[
-"You make me feel safe.",
-"You understand me.",
-"You make distance feel small.",
-"You are patient with me.",
-"You make me smile everyday.",
-"You feel like home.",
-"You choose me everyday.",
-"You make my world brighter."
-];
-
-function showReason(){
-  const random=reasons[Math.floor(Math.random()*reasons.length)];
-  document.getElementById("reasonText").innerText=random;
+function finishQuiz(){
+  quizBox.innerHTML = `<div class="result">
+    <h3>I love you so much 💖</h3>
+    <img src="happy.gif">
+  </div>`;
+  setTimeout(()=>backToGifts("gift2"),4000);
 }
 </script>
 
 </body>
 </html>
+
+
+
